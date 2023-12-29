@@ -14,7 +14,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 export async function fetchRevenue() {
   // Add noStore() here prevent the response from being cached.
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
-  // noStore();
+  noStore();
 
   try {
     // Artificially delay a response for demo purposes.
@@ -35,7 +35,7 @@ export async function fetchRevenue() {
 }
 
 export async function fetchLatestInvoices() {
-  // noStore();
+  noStore();
   try {
     console.log('Fetching latest invoices ...');
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -60,7 +60,7 @@ export async function fetchLatestInvoices() {
 }
 
 export async function fetchCardData() {
-  // noStore();
+  noStore();
   try {
     console.log('Fetching cards data...');
     // await new Promise((resolve) => setTimeout(resolve, 1000));
