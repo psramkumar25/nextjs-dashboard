@@ -66,14 +66,25 @@ export async function createInvoice(prevState: FormState, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(id: string, formData: FormData) {
-  try {
-    const { customerId, amount, status } = UpdateInvoice.parse(
-      Object.fromEntries(formData),
-    );
-    const amountInCents = amount * 100;
+export async function updateInvoice(id: string, prevState: FormState, formData: FormData) {
+  // Validate formadata using ZOd
+  const invoiceData = UpdateInvoice.safeParse(Object.fromEntries(formData));
 
-    // throw new Error('Failed to Update Invoice');
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!invoiceData.success) {
+    return {
+      errors: invoiceData.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Update Invoice.',
+    };
+  }
+
+  // Prepare data for updating the database
+  const { customerId, amount, status } = invoiceData.data;
+  const amountInCents = amount * 100;
+
+  // throw new Error('Failed to Update Invoice');
+  // Update the database
+  try {
     await sql`
       UPDATE invoices
       SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
@@ -82,7 +93,7 @@ export async function updateInvoice(id: string, formData: FormData) {
   } catch (error) {
     console.error(error);
     throw error;
-    return { message: 'Database Error: Failed to Update Invoice.' };
+    // return { message: 'Database Error: Failed to Update Invoice.' };
   }
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
